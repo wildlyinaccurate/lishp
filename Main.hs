@@ -1,9 +1,8 @@
 module Main where
 
-import Lishp.Interpreter
+import Lishp.Evaluator
+import Lishp.Parser
 import System.Environment
 
 main :: IO ()
-main = do
-         args <- getArgs
-         putStrLn (readExpr (args !! 0))
+main = getArgs >>= print . eval . readExpr . head
