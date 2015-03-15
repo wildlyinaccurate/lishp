@@ -1,0 +1,8 @@
+#!/usr/bin/runhaskell -v
+
+import Lishp.Interpreter
+
+main :: IO ()
+main = interpreter >>= loop
+  where
+    loop i = getLine >>= i >>= putStrLn >> loop i
