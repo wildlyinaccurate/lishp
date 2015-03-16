@@ -1,10 +1,9 @@
-module Lishp.Parser (readExpr) where
+module Lishp.Interpreter (readExpr, eval) where
 
 import Lishp.Types
+import Lishp.Primitives
 import Control.Monad
 import Text.ParserCombinators.Parsec hiding (spaces)
-
-instance Show LispVal where show = showVal
 
 symbol :: Parser Char
 symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
@@ -19,8 +18,8 @@ parseString = do
                 char '"'
                 return $ String x
 
-parseNumber :: Parser LispVal
-parseNumber = liftM (Number . read) $ many1 digit
+parseInteger :: Parser LispVal
+parseInteger = many1 digit >>= return . Integer . read
 
 parseAtom :: Parser LispVal
 parseAtom = do
@@ -35,12 +34,6 @@ parseAtom = do
 parseList :: Parser LispVal
 parseList = liftM List $ sepBy parseExpr spaces
 
-parseDottedList :: Parser LispVal
-parseDottedList = do
-    head <- endBy parseExpr spaces
-    tail <- char '.' >> spaces >> parseExpr
-    return $ DottedList head tail
-
 parseQuoted :: Parser LispVal
 parseQuoted = do
     char '\''
@@ -50,10 +43,10 @@ parseQuoted = do
 parseExpr :: Parser LispVal
 parseExpr = parseAtom
          <|> parseString
-         <|> parseNumber
+         <|> parseInteger
          <|> parseQuoted
          <|> do char '('
-                x <- try parseList <|> parseDottedList
+                x <- try parseList
                 char ')'
                 return x
 
@@ -62,14 +55,18 @@ readExpr input = case parse parseExpr "lisp" input of
     Left err -> String $ "No match: " ++ show err
     Right val -> val
 
-showVal :: LispVal -> String
-showVal (String contents) = "\"" ++ contents ++ "\""
-showVal (Atom name) = name
-showVal (Number contents) = show contents
-showVal (Bool True) = "#t"
-showVal (Bool False) = "#f"
-showVal (List contents) = "(" ++ unwordsList contents ++ ")"
-showVal (DottedList head tail) = "(" ++ unwordsList head ++ " . " ++ showVal tail ++ ")"
+eval :: LispVal -> LispVal
+eval val@(String _) = val
+eval val@(Integer _) = val
+eval val@(Bool _) = val
+eval (List [Atom "quote", val]) = val
+eval (List (Atom func : args)) = apply func $ map eval args
 
-unwordsList :: [LispVal] -> String
-unwordsList = unwords . map showVal
+apply :: String -> [LispVal] -> LispVal
+apply func args = maybe (Bool False) ($ args) $ lookup func primitives
+
+instance Show LispVal where
+    show (String s) = show s
+    show (Integer n) = show n
+    show (Bool b) = if b then "#t" else "#f"
+    show (List l) = "(" ++ unwords (map show l) ++ ")"

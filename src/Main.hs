@@ -1,7 +1,6 @@
 module Main where
 
-import Lishp.Evaluator
-import Lishp.Parser
+import Lishp.Interpreter
 import System.Environment
 
 main :: IO ()

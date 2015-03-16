@@ -1,11 +1,6 @@
-module Lishp.Types where
+module Lishp.Primitives (primitives) where
 
-data LispVal = Atom String
-             | List [LispVal]
-             | DottedList [LispVal] LispVal
-             | Number Integer
-             | String String
-             | Bool Bool
+import Lishp.Types
 
 primitives :: [(String, [LispVal] -> LispVal)]
 primitives = [("+", numericBinop (+)),
@@ -17,10 +12,10 @@ primitives = [("+", numericBinop (+)),
               ("remainder", numericBinop rem)]
 
 numericBinop :: (Integer -> Integer -> Integer) -> [LispVal] -> LispVal
-numericBinop op params = Number $ foldl1 op $ map unpackNum params
+numericBinop op params = Integer $ foldl1 op $ map unpackNum params
 
 unpackNum :: LispVal -> Integer
-unpackNum (Number n) = n
+unpackNum (Integer n) = n
 unpackNum (String n) = let parsed = reads n :: [(Integer, String)] in
                            if null parsed
                               then 0
