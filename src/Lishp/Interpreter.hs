@@ -54,10 +54,10 @@ parseQuoted = do
     return $ List [Atom "quote", x]
 
 parseExpr :: Parser LispVal
-parseExpr = parseAtom
-         <|> parseString
+parseExpr = parseString
          <|> parseNumber
          <|> parseQuoted
+         <|> parseAtom
          <|> do char '('
                 x <- try parseList
                 char ')'
