@@ -2,8 +2,9 @@ module Lishp.Interpreter (readExpr, eval) where
 
 import Lishp.Types
 import Lishp.Primitives
-import Control.Monad
 import Text.ParserCombinators.Parsec hiding (spaces)
+import Control.Monad
+import Control.Applicative hiding ((<|>), many, optional)
 
 symbol :: Parser Char
 symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
@@ -22,10 +23,16 @@ parseString = do
                 x <- many $ many1 (noneOf "\"\\" ) <|>
                     escapedChars
                 char '"'
-                return $ String x
+                return $ String (concat x)
 
-parseInteger :: Parser LispVal
-parseInteger = many1 digit >>= return . Integer . read
+parseNumber :: Parser LispVal
+parseNumber =  (Float . read) `fmap` try dec
+           <|> (Integer . read) `fmap` try neg
+           <|> (Integer . read) `fmap` pos
+
+  where pos = many1 digit
+        neg = (:) <$> char '-' <*> pos
+        dec = (++) <$> (pos <|> neg) <*> ((:) <$> char '.' <*> pos)
 
 parseAtom :: Parser LispVal
 parseAtom = do
@@ -49,7 +56,7 @@ parseQuoted = do
 parseExpr :: Parser LispVal
 parseExpr = parseAtom
          <|> parseString
-         <|> parseInteger
+         <|> parseNumber
          <|> parseQuoted
          <|> do char '('
                 x <- try parseList
@@ -64,6 +71,7 @@ readExpr input = case parse parseExpr "lisp" input of
 eval :: LispVal -> LispVal
 eval val@(String _) = val
 eval val@(Integer _) = val
+eval val@(Float _) = val
 eval val@(Bool _) = val
 eval (List [Atom "quote", val]) = val
 eval (List (Atom func : args)) = apply func $ map eval args
@@ -74,5 +82,6 @@ apply func args = maybe (Bool False) ($ args) $ lookup func primitives
 instance Show LispVal where
     show (String s) = show s
     show (Integer n) = show n
+    show (Float n) = show n
     show (Bool b) = if b then "#t" else "#f"
     show (List l) = "(" ++ unwords (map show l) ++ ")"

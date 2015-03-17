@@ -25,6 +25,16 @@ it_parses_floats() {
     test "$result" = "10.48"
 }
 
+it_parses_boolean_true() {
+    result=$(bin/lishp '#t')
+    test "$result" = "#t"
+}
+
+it_parses_boolean_false() {
+    result=$(bin/lishp '#f')
+    test "$result" = "#f"
+}
+
 it_parses_lists() {
     result=$(bin/lishp "'(1 2 3)")
     test "$result" = "(1 2 3)"
