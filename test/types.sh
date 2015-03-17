@@ -5,6 +5,11 @@ it_parses_strings() {
     test "$result" = '"foo bar"'
 }
 
+it_parses_escaped_strings() {
+    result=$(bin/lishp '"foo \"baz\" bar"')
+    test "$result" = '"foo \"baz\" bar"'
+}
+
 it_parses_positive_integers() {
     result=$(bin/lishp 1048)
     test "$result" = "1048"
