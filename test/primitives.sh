@@ -5,9 +5,19 @@ it_performs_addition() {
     test "$result" = "13"
 }
 
+it_performs_addition_with_negative_numbers() {
+    result=$(bin/lishp "(+ -1 3)")
+    test "$result" = "2"
+}
+
 it_performs_subtraction() {
     result=$(bin/lishp "(- 9 3 1)")
     test "$result" = "5"
+}
+
+it_performs_subtraction_with_negative_numbers() {
+    result=$(bin/lishp "(- -5 2)")
+    test "$result" = "-7"
 }
 
 it_performs_subtraction_below_zero() {
