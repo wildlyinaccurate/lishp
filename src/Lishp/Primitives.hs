@@ -1,8 +1,9 @@
 module Lishp.Primitives (primitives) where
 
 import Lishp.Types
+import Control.Monad.Error
 
-primitives :: [(String, [LispVal] -> LispVal)]
+primitives :: [(String, [LispVal] -> ThrowsError LispVal)]
 primitives = [("+", numericBinop (+)),
               ("-", numericBinop (-)),
               ("*", numericBinop (*)),
@@ -11,14 +12,16 @@ primitives = [("+", numericBinop (+)),
               ("quotient", numericBinop quot),
               ("remainder", numericBinop rem)]
 
-numericBinop :: (Integer -> Integer -> Integer) -> [LispVal] -> LispVal
-numericBinop op params = Integer $ foldl1 op $ map unpackNum params
+numericBinop :: (Integer -> Integer -> Integer) -> [LispVal] -> ThrowsError LispVal
+numericBinop op           []  = throwError $ NumArgs 2 []
+numericBinop op singleVal@[_] = throwError $ NumArgs 2 singleVal
+numericBinop op params        = mapM unpackNum params >>= return . Integer . foldl1 op
 
-unpackNum :: LispVal -> Integer
-unpackNum (Integer n) = n
-unpackNum (String n) = let parsed = reads n :: [(Integer, String)] in
+unpackNum :: LispVal -> ThrowsError Integer
+unpackNum (Integer n) = return n
+unpackNum (String n) = let parsed = reads n in
                            if null parsed
-                              then 0
-                              else fst $ parsed !! 0
+                             then throwError $ TypeMismatch "integer" $ String n
+                             else return $ fst $ parsed !! 0
 unpackNum (List [n]) = unpackNum n
-unpackNum _ = 0
+unpackNum notNum     = throwError $ TypeMismatch "integer" notNum
