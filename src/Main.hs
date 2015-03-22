@@ -1,8 +1,9 @@
 module Main where
 
-import Lishp.Interpreter
 import Control.Monad
 import System.Environment
+
+import Lishp.Interpreter
 
 main :: IO ()
 main = do

@@ -1,6 +1,7 @@
 module Lishp.Types where
 
 import Control.Monad.Error
+
 import Text.Parsec.Error
 
 data LispVal = Atom String

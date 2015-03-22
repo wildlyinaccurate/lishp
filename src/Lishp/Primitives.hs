@@ -1,7 +1,8 @@
 module Lishp.Primitives (primitives) where
 
-import Lishp.Types
 import Control.Monad.Error
+
+import Lishp.Types
 
 primitives :: [(String, [LispVal] -> ThrowsError LispVal)]
 primitives = [("+", numericBinop (+)),

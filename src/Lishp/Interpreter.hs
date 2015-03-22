@@ -6,12 +6,14 @@ module Lishp.Interpreter
     , trapError
     ) where
 
-import Lishp.Types
-import Lishp.Primitives
-import Text.ParserCombinators.Parsec hiding (spaces)
 import Control.Monad
 import Control.Monad.Error
 import Control.Applicative hiding ((<|>), many, optional)
+
+import Text.ParserCombinators.Parsec hiding (spaces)
+
+import Lishp.Types
+import Lishp.Primitives
 
 symbol :: Parser Char
 symbol = oneOf "!#$%&|*+-/:<=>?@^_~"
