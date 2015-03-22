@@ -2,6 +2,7 @@ module Lishp.Interpreter
     (
       readExpr
     , eval
+    , evalString
     , extractValue
     , trapError
     ) where
@@ -76,6 +77,9 @@ readExpr :: String -> ThrowsError LispVal
 readExpr input = case parse parseExpr "lisp" input of
     Left err -> throwError $ Parser err
     Right val -> return val
+
+evalString :: String -> IO String
+evalString expr = return $ extractValue $ trapError (liftM show $ readExpr expr >>= eval)
 
 eval :: LispVal -> ThrowsError LispVal
 eval val@(String _) = return val
