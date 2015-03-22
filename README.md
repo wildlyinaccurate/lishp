@@ -2,6 +2,12 @@
 
 A tiny Lisp interpreter written in Haskell.
 
+## Prerequisites
+
+```
+cabal install random list control.monad.writer mtl parsec readline
+```
+
 ## Installation
 
 ```
