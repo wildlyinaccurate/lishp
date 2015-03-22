@@ -1,5 +1,7 @@
 # Lishp
 
+[![Build Status](https://travis-ci.org/wildlyinaccurate/lishp.svg?branch=master)](https://travis-ci.org/wildlyinaccurate/lishp)
+
 A tiny Lisp interpreter written in Haskell.
 
 ## Prerequisites
