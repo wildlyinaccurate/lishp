@@ -1,10 +1,7 @@
 all:: build
 
-build: lishp
-	echo "Built lishp at 'bin/lishp'"
-
-lishp:
-	cd src && ghc --make -o ../bin/lishp Main
+build:
+	cabal build
 
 test: build
-	roundup test/*
+	LISHP=dist/build/lishp/lishp roundup test/*
