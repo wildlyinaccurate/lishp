@@ -41,6 +41,6 @@ it_parses_lists() {
 }
 
 it_parses_nested_lists() {
-    result=$($LISHP "'(1 2 '(3))")
-    test "$result" = "(1 2 (quote 3)))"
+    result=$($LISHP "'(1 2 (3))")
+    test "$result" = "(1 2 (3))"
 }
