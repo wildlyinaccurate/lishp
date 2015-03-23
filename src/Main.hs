@@ -17,10 +17,12 @@ main = do args <- getArgs
 evalAndPrint :: String -> IO ()
 evalAndPrint expr = evalString expr >>= putStrLn
 
+repl :: IO ()
 repl = do
     loadHistory
     replLoop
 
+replLoop :: IO ()
 replLoop = do
     line <- readline "lishp=> "
     case line of
