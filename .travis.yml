@@ -8,4 +8,4 @@ before_script:
   - chmod +x roundup
 
 script:
-  cabal configure && cabal build && make test
+  cabal configure && cabal build && make test -e ROUNDUP=./roundup

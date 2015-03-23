@@ -1,3 +1,5 @@
+ROUNDUP ?= 'roundup'
+
 all:: build
 
 build: lishp copy
@@ -10,4 +12,4 @@ copy:
 	cp dist/build/lishp/lishp bin/lishp
 
 test: build
-	LISHP=dist/build/lishp/lishp roundup test/*
+	LISHP=dist/build/lishp/lishp $(ROUNDUP) test/*
