@@ -15,9 +15,19 @@ make
 
 ## Usage
 
+Lishp can be run as a REPL
+
 ```
-$ ./bin/lishp "(+ 1 1)"
-2
+$ ./bin/lishp
+lishp=> (/ 8 (+ 1 1))
+4
+```
+
+Or it can take programs directly
+
+```
+$ ./bin/lishp '(/ 8 (+ 1 1))'
+4
 ```
 
 ## Tests

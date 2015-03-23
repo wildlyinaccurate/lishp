@@ -22,7 +22,7 @@ repl = do
     replLoop
 
 replLoop = do
-    line <- readline "lishp>>> "
+    line <- readline "lishp=> "
     case line of
         Nothing -> return ()
         Just "" -> replLoop
