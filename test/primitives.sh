@@ -46,11 +46,16 @@ it_performs_multiplication_with_floats() {
 }
 
 it_performs_division_with_integers() {
-    result=$($LISHP "(/ 6 2)")
-    test "$result" = "3"
+    result=$($LISHP "(/ 8 2 2)")
+    test "$result" = "2"
 }
 
 it_performs_division_with_floats() {
     result=$($LISHP "(/ 1.0 2)")
     test "$result" = "0.5"
+}
+
+it_throws_an_error_on_divide_by_zero() {
+    result=$($LISHP "(/ 5 0)")
+    test "$result" = "Division by zero!"
 }

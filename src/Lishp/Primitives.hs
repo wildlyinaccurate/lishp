@@ -8,10 +8,23 @@ primitives :: [(String, [LispVal] -> ThrowsError LispVal)]
 primitives = [("+", numericBinop (+)),
               ("-", numericBinop (-)),
               ("*", numericBinop (*)),
-              ("/", numericBinop div),
+              ("/", divOp),
               ("mod", numericBinop mod),
               ("quotient", numericBinop quot),
               ("remainder", numericBinop rem)]
+
+divOp :: [LispVal] -> ThrowsError LispVal
+divOp a@[_] = throwError $ NumArgs 2 a
+divOp (h:t) = foldM divOp' h t
+
+divOp' :: LispVal -> LispVal -> ThrowsError LispVal
+divOp' s1 s2
+    | s2 == Integer 0 || s2 == Float 0 = throwError $ DivisionByZero
+    | otherwise = return $ case (s1, s2) of
+        (Integer a, Integer b) -> Integer $ quot a b
+        (Integer a, Float b) -> Float $ (fromIntegral a) / b
+        (Float a, Integer b) -> Float $ a / (fromIntegral b)
+        (Float a, Float b) -> Float $ a / b
 
 numericBinop :: (Integer -> Integer -> Integer) -> [LispVal] -> ThrowsError LispVal
 numericBinop op           []  = throwError $ NumArgs 2 []
