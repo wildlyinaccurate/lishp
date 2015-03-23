@@ -12,10 +12,12 @@ import System.Directory (getHomeDirectory, doesFileExist)
 import System.IO (hGetLine, hFlush, hIsEOF, stdin, stdout)
 import System.IO.Error (tryIOError)
 
+historyFile :: IO [Char]
 historyFile = do
     home <- getHomeDirectory
     return $ home ++ "/.lishp-history"
 
+loadHistory :: IO ()
 loadHistory = do
     hfile <- historyFile
     fileExists <- doesFileExist hfile
@@ -25,6 +27,7 @@ loadHistory = do
         return ()
     return ()
 
+readline :: String -> IO (Maybe String)
 readline prompt = do
     hfile <- historyFile
     maybeLine <- RL.readline prompt
