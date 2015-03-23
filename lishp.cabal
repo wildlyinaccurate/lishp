@@ -11,13 +11,10 @@ license-file:        LICENSE
 author:              Joseph Wynn
 maintainer:          joseph@wildlyinaccurate.com
 -- copyright:
--- category:
+category:            Language
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
-
-library
-  hs-Source-Dirs:  src
 
 executable lishp
   main-is:             Main.hs

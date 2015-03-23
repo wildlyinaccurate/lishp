@@ -4,17 +4,12 @@
 
 A tiny Lisp interpreter written in Haskell.
 
-## Prerequisites
-
-```
-cabal install random list control.monad.writer mtl parsec readline
-```
-
 ## Installation
 
 ```
 git clone https://github.com/wildlyinaccurate/lishp.git
 cd lishp
+cabal install
 make
 ```
 
