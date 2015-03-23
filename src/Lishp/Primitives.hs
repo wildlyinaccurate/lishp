@@ -1,21 +1,36 @@
+{-# LANGUAGE RankNTypes #-}
 module Lishp.Primitives (primitives) where
 
 import Control.Monad.Error
 
 import Lishp.Types
 
+(|>) = flip ($)
+
 primitives :: [(String, [LispVal] -> ThrowsError LispVal)]
-primitives = [("+", numericBinop (+)),
-              ("-", numericBinop (-)),
-              ("*", numericBinop (*)),
+primitives = [("+", math (+)),
+              ("-", math (-)),
+              ("*", math (*)),
               ("/", divOp),
               ("mod", numericBinop mod),
-              ("quotient", numericBinop quot),
               ("remainder", numericBinop rem)]
 
+math :: (forall a. Num a => a -> a -> a) -> [LispVal] -> ThrowsError LispVal
+math op           [] = throwError $ NumArgs 2 []
+math op singleVal@[_] = throwError $ NumArgs 2 singleVal
+math op params        = return $ params |> foldl1 (mathOp op)
+
+mathOp :: (forall a. Num a => a -> a -> a) -> LispVal -> LispVal -> LispVal
+mathOp (?) s1 s2 = case (s1, s2) of
+    (Integer a, Integer b) -> Integer $ a ? b
+    (Integer a, Float b) -> Float $ (fromIntegral a) ? b
+    (Float a, Integer b) -> Float $ a ? (fromIntegral b)
+    (Float a, Float b) -> Float $ a ? b
+
 divOp :: [LispVal] -> ThrowsError LispVal
-divOp a@[_] = throwError $ NumArgs 2 a
-divOp (h:t) = foldM divOp' h t
+divOp           []  = throwError $ NumArgs 2 []
+divOp singleVal@[_] = throwError $ NumArgs 2 singleVal
+divOp (h:t)         = foldM divOp' h t
 
 divOp' :: LispVal -> LispVal -> ThrowsError LispVal
 divOp' s1 s2

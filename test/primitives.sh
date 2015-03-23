@@ -59,3 +59,13 @@ it_throws_an_error_on_divide_by_zero() {
     result=$($LISHP "(/ 5 0)")
     test "$result" = "Division by zero!"
 }
+
+it_performs_modulus() {
+    result=$($LISHP "(mod 4 3)")
+    test "$result" = "1"
+ }
+
+it_calculates_division_remainder() {
+    result=$($LISHP "(remainder 5 2)")
+    test "$result" = "1"
+ }
