@@ -2,7 +2,6 @@ language: haskell
 ghc:
   - 7.8
   - 7.6
-  - 7.4
 
 before_script:
   - curl -sS -o roundup https://raw.githubusercontent.com/bmizerany/roundup/f526c39ee293adcb4d41f353f2cfd71054db3242/roundup.sh
