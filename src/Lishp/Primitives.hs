@@ -5,52 +5,72 @@ import Control.Monad.Error
 
 import Lishp.Types
 
-(|>) = flip ($)
-
 primitives :: [(String, [LispVal] -> ThrowsError LispVal)]
-primitives = [("+", math (+)),
-              ("-", math (-)),
-              ("*", math (*)),
-              ("/", divOp),
-              ("mod", numericBinop mod),
-              ("remainder", numericBinop rem)]
+primitives = [("+", numericOp (+)),
+              ("-", numericOp (-)),
+              ("*", numericOp (*)),
+              ("/", pdiv),
+              ("=", numericBoolBinop (==)),
+              ("<", numericBoolBinop (<)),
+              (">", numericBoolBinop (>)),
+              ("mod", integralBinop mod),
+              ("remainder", integralBinop rem)]
 
-math :: (forall a. Num a => a -> a -> a) -> [LispVal] -> ThrowsError LispVal
-math op           [] = throwError $ NumArgs 2 []
-math op singleVal@[_] = throwError $ NumArgs 2 singleVal
-math op params        = return $ params |> foldl1 (mathOp op)
+-- Wrapper for variadic numerical operations
+numericOp :: (forall a. (Num a) => a -> a -> a) -> [LispVal] -> ThrowsError LispVal
+numericOp op params = if length params < 2
+                      then throwError $ NumArgs 2 params
+                      else return $ foldl1 (numericBinop op) params
 
-mathOp :: (forall a. Num a => a -> a -> a) -> LispVal -> LispVal -> LispVal
-mathOp (?) s1 s2 = case (s1, s2) of
-    (Integer a, Integer b) -> Integer $ a ? b
-    (Integer a, Float b) -> Float $ (fromIntegral a) ? b
-    (Float a, Integer b) -> Float $ a ? (fromIntegral b)
-    (Float a, Float b) -> Float $ a ? b
+-- Polymorphic binary numerical operations
+numericBinop :: (forall a. (Num a) => a -> a -> a) -> LispVal -> LispVal -> LispVal
+numericBinop op s1 s2 = case (s1, s2) of
+    (Integer a, Integer b) -> Integer $ a `op` b
+    (Integer a, Float b) -> Float $ (fromIntegral a) `op` b
+    (Float a, Integer b) -> Float $ a `op` (fromIntegral b)
+    (Float a, Float b) -> Float $ a `op` b
 
-divOp :: [LispVal] -> ThrowsError LispVal
-divOp           []  = throwError $ NumArgs 2 []
-divOp singleVal@[_] = throwError $ NumArgs 2 singleVal
-divOp (h:t)         = foldM divOp' h t
+-- Wrapper for polymorphic division
+pdiv :: [LispVal] -> ThrowsError LispVal
+pdiv []    = throwError $ NumArgs 2 []
+pdiv (h:t) = if length t == 0
+             then throwError $ NumArgs 2 [h]
+             else foldM divBinop h t
 
-divOp' :: LispVal -> LispVal -> ThrowsError LispVal
-divOp' s1 s2
+-- Polymorphic division
+divBinop :: LispVal -> LispVal -> ThrowsError LispVal
+divBinop s1 s2
     | s2 == Integer 0 || s2 == Float 0 = throwError $ DivisionByZero
-    | otherwise = return $ case (s1, s2) of
-        (Integer a, Integer b) -> Integer $ quot a b
-        (Integer a, Float b) -> Float $ (fromIntegral a) / b
-        (Float a, Integer b) -> Float $ a / (fromIntegral b)
-        (Float a, Float b) -> Float $ a / b
+    | otherwise = case (s1, s2) of
+        (Integer a, Integer b) -> return $ Integer $ quot a b
+        (Integer a, Float b) -> return $ Float $ (fromIntegral a) / b
+        (Float a, Integer b) -> return $ Float $ a / (fromIntegral b)
+        (Float a, Float b) -> return $ Float $ a / b
+        (_, _) -> throwError $ TypeMismatch "number" $ List [s1, s2]
 
-numericBinop :: (Integer -> Integer -> Integer) -> [LispVal] -> ThrowsError LispVal
-numericBinop op           []  = throwError $ NumArgs 2 []
-numericBinop op singleVal@[_] = throwError $ NumArgs 2 singleVal
-numericBinop op params        = mapM unpackNum params >>= return . Integer . foldl1 op
+-- Wrapper for binary integral operations
+integralBinop :: (Integer -> Integer -> Integer) -> [LispVal] -> ThrowsError LispVal
+integralBinop op           []  = throwError $ NumArgs 2 []
+integralBinop op singleVal@[_] = throwError $ NumArgs 2 singleVal
+integralBinop op params        = mapM unpackIntegral params >>= return . Integer . foldl1 op
 
-unpackNum :: LispVal -> ThrowsError Integer
-unpackNum (Integer n) = return n
-unpackNum (String n) = let parsed = reads n in
-                           if null parsed
-                             then throwError $ TypeMismatch "integer" $ String n
-                             else return $ fst $ parsed !! 0
-unpackNum (List [n]) = unpackNum n
-unpackNum notNum     = throwError $ TypeMismatch "integer" notNum
+-- Integral unpacking and error handling
+unpackIntegral :: LispVal -> ThrowsError Integer
+unpackIntegral (Integer n) = return n
+unpackIntegral (String n) = let parsed = reads n in
+                              if null parsed
+                                then throwError $ TypeMismatch "integer" $ String n
+                                else return $ fst $ parsed !! 0
+unpackIntegral (List [n]) = unpackIntegral n
+unpackIntegral notNum     = throwError $ TypeMismatch "integer" notNum
+
+-- Wrapper for binary boolean operations
+boolBinop :: (LispVal -> ThrowsError a) -> (a -> a -> Bool) -> [LispVal] -> ThrowsError LispVal
+boolBinop unpacker op args = if length args /= 2
+                             then throwError $ NumArgs 2 args
+                             else do
+                               left <- unpacker $ args !! 0
+                               right <- unpacker $ args !! 1
+                               return $ Bool $ left `op` right
+
+numericBoolBinop = boolBinop unpackIntegral
