@@ -1,9 +1,25 @@
+it_can_check_multiple_values() {
+    test "$($LISHP '(= 2)')" = '#t'
+    test "$($LISHP '(= 2 2 2 2)')" = '#t'
+}
+
 it_checks_numeric_equality() {
     test "$($LISHP '(= 2 2)')" = '#t'
     test "$($LISHP '(= 2.0 2)')" = '#t'
 
     test "$($LISHP '(= 2 1)')" = '#f'
     test "$($LISHP '(= 2.0 1)')" = '#f'
+}
+
+it_checks_boolean_equality() {
+    test "$($LISHP '(= #t #t)')" = '#t'
+    test "$($LISHP '(= #f #f)')" = '#t'
+    test "$($LISHP '(= #f #t)')" = '#f'
+}
+
+it_checks_string_equality() {
+    test "$($LISHP '(= "foo" "foo")')" = '#t'
+    test "$($LISHP '(= "foo" "bar")')" = '#f'
 }
 
 it_compares_with_less_than() {

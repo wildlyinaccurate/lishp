@@ -10,7 +10,7 @@ primitives = [("+", numericOp (+)),
               ("-", numericOp (-)),
               ("*", numericOp (*)),
               ("/", pdiv),
-              ("=", numericBoolBinop (==)),
+              ("=", peq),
               ("<", numericBoolBinop (<)),
               (">", numericBoolBinop (>)),
               ("mod", integralBinop mod),
@@ -29,6 +29,10 @@ numericBinop op s1 s2 = case (s1, s2) of
     (Integer a, Float b) -> Float $ (fromIntegral a) `op` b
     (Float a, Integer b) -> Float $ a `op` (fromIntegral b)
     (Float a, Float b) -> Float $ a `op` b
+
+peq :: [LispVal] -> ThrowsError LispVal
+peq []   = throwError $ NumArgs 1 []
+peq args = return $ Bool $ and . zipWith (==) args $ drop 1 args
 
 -- Wrapper for polymorphic division
 pdiv :: [LispVal] -> ThrowsError LispVal
