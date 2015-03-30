@@ -64,6 +64,17 @@ unpackIntegral (String n) = let parsed = reads n in
 unpackIntegral (List [n]) = unpackIntegral n
 unpackIntegral notNum     = throwError $ TypeMismatch "integer" notNum
 
+-- Numeric unpacking and error handling. Cooerces Integer to Float.
+unpackNumber :: LispVal -> ThrowsError Double
+unpackNumber (Float n) = return n
+unpackNumber (Integer n) = return $ fromIntegral n
+unpackNumber (String n) = let parsed = reads n in
+                              if null parsed
+                                then throwError $ TypeMismatch "number" $ String n
+                                else return $ fst $ parsed !! 0
+unpackNumber (List [n]) = unpackNumber n
+unpackNumber notNum     = throwError $ TypeMismatch "number" notNum
+
 -- Wrapper for binary boolean operations
 boolBinop :: (LispVal -> ThrowsError a) -> (a -> a -> Bool) -> [LispVal] -> ThrowsError LispVal
 boolBinop unpacker op args = if length args /= 2
@@ -73,4 +84,4 @@ boolBinop unpacker op args = if length args /= 2
                                right <- unpacker $ args !! 1
                                return $ Bool $ left `op` right
 
-numericBoolBinop = boolBinop unpackIntegral
+numericBoolBinop = boolBinop unpackNumber
