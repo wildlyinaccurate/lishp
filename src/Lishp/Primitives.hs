@@ -12,7 +12,9 @@ primitives = [("+", numericOp (+)),
               ("/", pdiv),
               ("=", peq),
               ("<", numericBoolBinop (<)),
+              ("<=", numericBoolBinop (<=)),
               (">", numericBoolBinop (>)),
+              (">=", numericBoolBinop (>=)),
               ("mod", integralBinop mod),
               ("remainder", integralBinop rem)]
 

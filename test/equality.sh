@@ -30,10 +30,26 @@ it_compares_with_less_than() {
     test "$($LISHP '(< 5.0 2)')" = '#f'
 }
 
-it_compares_with_more_than() {
+it_compares_with_less_than_or_equal() {
+    test "$($LISHP '(<= 5 5)')" = '#t'
+    test "$($LISHP '(<= 4.0 5)')" = '#t'
+
+    test "$($LISHP '(<= 5 2)')" = '#f'
+    test "$($LISHP '(<= 5.0 2)')" = '#f'
+}
+
+it_compares_with_greater_than() {
     test "$($LISHP '(> 5 2)')" = '#t'
     test "$($LISHP '(> 5 2.0)')" = '#t'
 
     test "$($LISHP '(> 2 5)')" = '#f'
     test "$($LISHP '(> 2 5.0)')" = '#f'
+}
+
+it_compares_with_greater_than_or_equal() {
+    test "$($LISHP '(>= 5 5)')" = '#t'
+    test "$($LISHP '(>= 5 2.0)')" = '#t'
+
+    test "$($LISHP '(>= 2 5)')" = '#f'
+    test "$($LISHP '(>= 2 5.0)')" = '#f'
 }
