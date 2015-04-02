@@ -1,8 +1,13 @@
 module Lishp.Types where
 
 import Control.Monad.Except
+import Data.IORef
 
 import Text.Parsec.Error
+
+type Env = IORef [(String, IORef LispVal)]
+
+type IOThrowsError = ExceptT LispError IO
 
 data LispVal = Atom String
              | List [LispVal]
