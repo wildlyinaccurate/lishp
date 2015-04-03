@@ -31,3 +31,17 @@ it_performs_modulus() {
 it_calculates_division_remainder() {
     test $($LISHP '(remainder 5 2)') = '1'
  }
+
+it_performs_boolean_and() {
+    test $($LISHP '(&& #t #t)') = '#t'
+
+    test $($LISHP '(&& #f #f)') = '#f'
+    test $($LISHP '(&& #f #t)') = '#f'
+}
+
+it_performs_boolean_or() {
+    test $($LISHP '(|| #t #t)') = '#t'
+    test $($LISHP '(|| #t #f)') = '#t'
+
+    test $($LISHP '(|| #f #f)') = '#f'
+}

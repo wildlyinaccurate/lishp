@@ -15,6 +15,8 @@ primitives = [("+", numericOp (+)),
               ("<=", numericBoolBinop (<=)),
               (">", numericBoolBinop (>)),
               (">=", numericBoolBinop (>=)),
+              ("&&", boolBoolBinop (&&)),
+              ("||", boolBoolBinop (||)),
               ("mod", integralBinop mod),
               ("remainder", integralBinop rem)]
 
@@ -81,6 +83,10 @@ unpackNumber (String n) = let parsed = reads n in
 unpackNumber (List [n]) = unpackNumber n
 unpackNumber notNum     = throwError $ TypeMismatch "number" notNum
 
+unpackBool :: LispVal -> ThrowsError Bool
+unpackBool (Bool b) = return b
+unpackBool notBool = throwError $ TypeMismatch "boolean" notBool
+
 -- Wrapper for binary boolean operations
 boolBinop :: (LispVal -> ThrowsError a) -> (a -> a -> Bool) -> [LispVal] -> ThrowsError LispVal
 boolBinop unpacker op args = if length args /= 2
@@ -91,3 +97,4 @@ boolBinop unpacker op args = if length args /= 2
                                return $ Bool $ left `op` right
 
 numericBoolBinop = boolBinop unpackNumber
+boolBoolBinop = boolBinop unpackBool
