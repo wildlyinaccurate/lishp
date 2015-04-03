@@ -1,6 +1,6 @@
 module Lishp.Types where
 
-import Control.Monad.Error
+import Control.Monad.Except
 
 import Text.Parsec.Error
 
@@ -39,10 +39,6 @@ data LispError = NumArgs Integer [LispVal]
                | UnboundVar String String
                | DivisionByZero
                | Default String
-
-instance Error LispError where
-    noMsg = Default "An error has occurred"
-    strMsg = Default
 
 instance Show LispError where show = showError
 

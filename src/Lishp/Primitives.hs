@@ -1,7 +1,7 @@
 {-# LANGUAGE RankNTypes #-}
 module Lishp.Primitives (primitives) where
 
-import Control.Monad.Error
+import Control.Monad.Except
 
 import Lishp.Types
 

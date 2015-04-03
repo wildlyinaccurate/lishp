@@ -1,7 +1,7 @@
 module Lishp.Interpreter (evalString) where
 
 import Control.Monad
-import Control.Monad.Error
+import Control.Monad.Except
 import Control.Applicative hiding ((<|>), many, optional)
 
 import Text.ParserCombinators.Parsec hiding (spaces)
