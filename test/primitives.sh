@@ -1,4 +1,4 @@
-describe 'Primitives'
+describe "Primitive functions"
 
 it_performs_addition() {
     test $($LISHP '(+ 1 3 9)') = '13'

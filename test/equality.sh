@@ -1,3 +1,5 @@
+describe "Cross-type equality"
+
 it_can_check_multiple_values() {
     test "$($LISHP '(= 2)')" = '#t'
     test "$($LISHP '(= 2 2 2 2)')" = '#t'
