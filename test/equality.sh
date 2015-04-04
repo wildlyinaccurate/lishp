@@ -24,6 +24,11 @@ it_checks_string_equality() {
     test "$($LISHP '(= "foo" "bar")')" = '#f'
 }
 
+it_checks_list_equality() {
+    test "$($LISHP "(= (quote (1 2)) '(1 2))")" = '#t'
+    test "$($LISHP "(= (quote (1 2)) '(1 3))")" = '#f'
+}
+
 it_compares_with_less_than() {
     test "$($LISHP '(< 2 5)')" = '#t'
     test "$($LISHP '(< 2.0 5)')" = '#t'
