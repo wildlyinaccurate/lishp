@@ -4,8 +4,7 @@ ghc:
   - 7.6
 
 before_script:
-  - curl -sS -o roundup https://raw.githubusercontent.com/bmizerany/roundup/f526c39ee293adcb4d41f353f2cfd71054db3242/roundup.sh
-  - chmod +x roundup
+  - curl -sS -o roundup https://raw.githubusercontent.com/bmizerany/roundup/v0.0.5/roundup.sh
 
 script:
-  cabal configure && cabal build && make test -e ROUNDUP=./roundup
+  cabal configure && cabal build && make test -e ROUNDUP='/bin/bash roundup'
