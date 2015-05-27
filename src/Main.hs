@@ -12,7 +12,7 @@ main :: IO ()
 main = do args <- getArgs
           case length args of
                0 -> repl
-               1 -> nullEnv >>= flip evalAndPrint (args !! 0)
+               1 -> primitiveBindings >>= flip evalAndPrint (args !! 0)
                otherwise -> putStrLn "Program takes only 0 or 1 argument"
 
 evalAndPrint :: Env -> String -> IO ()
@@ -21,7 +21,7 @@ evalAndPrint env expr = evalString env expr >>= putStrLn
 repl :: IO ()
 repl = do
     loadHistory
-    nullEnv >>= replLoop
+    primitiveBindings >>= replLoop
 
 replLoop :: Env -> IO ()
 replLoop env = do

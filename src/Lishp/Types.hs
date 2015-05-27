@@ -15,13 +15,23 @@ data LispVal = Atom String
              | Float Double
              | String String
              | Bool Bool
+             | PrimitiveFunc ([LispVal] -> ThrowsError LispVal)
+             | Func { params :: [String], vararg :: (Maybe String),
+                      body :: [LispVal], closure :: Env }
 
 instance Show LispVal where
+    show (Atom s) = s
     show (String s) = show s
     show (Integer n) = show n
     show (Float n) = show n
     show (Bool b) = if b then "#t" else "#f"
     show (List l) = "(" ++ unwordsList l ++ ")"
+    show (PrimitiveFunc _) = "<primitive>"
+    show (Func { params = args, vararg = varargs, body = body, closure = env }) =
+        "(lambda (" ++ unwords (map show args) ++
+            (case varargs of
+               Nothing -> ""
+               Just arg -> " . " ++ arg) ++ ") ...)"
 
 instance Eq (LispVal) where
     Atom a == Atom b = a == b
